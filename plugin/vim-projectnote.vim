@@ -56,7 +56,7 @@ function! s:PNoteCloseNote() "{{{
 		silent exec "sbuffer " . g:opennote
 		let notename=expand('%:t')
 		silent exec "au BufWinLeave *" . notename . " let g:opennote = \"\""
-		silent exec "q!"
+		silent exec "bd " . switchback
 		silent exec "sbuffer " . switchback
 	end
 endfunction "}}}
