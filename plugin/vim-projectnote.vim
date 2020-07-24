@@ -132,8 +132,8 @@ endpy
 	silent exec "sbuffer " . switchback
 endfunction"}}}
 
-command! s:PNoteOpen :call s:PNoteGetProjNote()
-command! -nargs=1 s:PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
-command! -nargs=1 s:PNoteAddNote :call s:PNoteAddNote(<f-args>)
-command! -nargs=1 s:PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
+command! PNoteOpen :call s:PNoteGetProjNote()
+command! -nargs=1 PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
+command! -nargs=1 PNoteAddNote :call s:PNoteAddNote(<f-args>)
+command! -nargs=1 PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
 
