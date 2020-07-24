@@ -1,0 +1,6 @@
+#!/bin/bash
+
+dir=$PWD;
+cd $HOME/.vim/plugged/vim-projectnote &&
+git reset --hard HEAD^ &&
+cd $PWD;
