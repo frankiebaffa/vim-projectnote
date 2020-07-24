@@ -1,0 +1,30 @@
+vim-projectnote  t1. Write a catchy tagline
+
+Author: Frankie Baffa
+License: Same terms as Vim itself (see license)
+
+INTRODUCTION                                    *projectnote*
+
+Whenever you edit a file from a Git repository, a set of commands is defined
+that serve as a gateway to Git.
+
+COMMANDS                                        *projectnote-commands*
+
+These commands are local to the buffers in which they work (generally, buffers
+that are part of Git repositories).
+
+:PNoteOpen                  Checks if project note already exists. If so, opens
+                            note on right in :res 40 window.
+:PNoteAddTodo {args}        Adds a new todo below the latest. Increments the
+                            todo number by 1.
+:PNoteAddNote {args}        Adds a new note below the latest. Increments the
+                            note number by 1.
+:PNoteStrikethrough {args}  Marks the specified note as complete.
+
+ABOUT
+
+Grab the latest version or report a bug on GitHub:
+
+https://github.com/frankiebaffa/vim-projectnote
+
+ vim:tw=78:et:ft=help:norl:
