@@ -34,6 +34,14 @@ function! s:PNoteGetProjNote() "{{{
 	end
 endfunction "}}}
 
+function! s:PNoteToggleNote() "{{{
+	if g:opennote == ""
+		call s:PNoteGetProjNote()
+	else if g:opennote != ""
+		call s:PNoteCloseNote()
+	end
+endfunction "}}}
+
 function! s:PNoteCloseNote() "{{{
 	if g:opennote != ""
 		let switchback=@%
@@ -147,6 +155,7 @@ command! -nargs=1 PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
 command! -nargs=1 PNoteAddNote :call s:PNoteAddNote(<f-args>)
 command! -nargs=1 PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
 command! PNoteClose :call s:PNoteCloseNote()
+command! PNoteToggle :call s:PNoteToggleNote()
 " }}}
 
 " vim:fdm=marker
