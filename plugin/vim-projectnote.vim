@@ -19,6 +19,7 @@ endfunction "}}}
 function! s:PNoteGetProjNote() "{{{
 	if g:opennote == ""
 		let switchback=@%
+		silent sbuffer 1
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
 		if !filereadable(checkname)
@@ -27,9 +28,15 @@ function! s:PNoteGetProjNote() "{{{
 		if filereadable(checkname)
 			let g:opennote=checkname
 			silent exec "vsplit " . checkname
+			silent setlocal nolist
+			silent setlocal breakat=" ^I!@*-+;:,./?"
+			let &showbreak='+++ '
+			setlocal wrap linebreak
+			setlocal textwidth=0
+			setlocal wrapmargin=0
 			silent setlocal noma
-			silent exec "wincmd L"
-			silent exec "vert res 40"
+			silent wincmd L
+			silent vert res 40
 			silent exec "sbuffer " . switchback
 		end
 	end
