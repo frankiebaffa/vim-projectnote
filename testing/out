@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# out
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+files=("ftdetect/projectnote.vim" "syntax/projectnote.vim" "plugin/vim-projectnote.vim")
+for file in "${files[@]}"
+do
+	echo -ne "throwing ${file}...";
+	cp "${DIR}/../${file}" "$HOME/.vim/plugged/vim-projectnote/${file}" &&
+		echo -ne "success.\\n";
+done
+
