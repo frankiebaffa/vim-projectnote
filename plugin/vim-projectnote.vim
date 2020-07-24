@@ -19,7 +19,6 @@ endfunction "}}}
 function! s:PNoteGetProjNote() "{{{
 	if g:opennote == ""
 		let switchback=@%
-		silent sbuffer 1
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
 		if !filereadable(checkname)
