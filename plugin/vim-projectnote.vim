@@ -18,7 +18,7 @@ endfunction "}}}
 
 function! s:PNoteGetProjNote() "{{{
 	if g:opennote == ""
-		let switchback=winbufnr(winnr())
+		let switchback=@%
 		silent sbuffer 1
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
@@ -52,17 +52,17 @@ endfunction "}}}
 
 function! s:PNoteCloseNote() "{{{
 	if g:opennote != ""
-		let switchback=winbufnr(winnr())
+		let switchback=@%
 		silent exec "sbuffer " . g:opennote
 		let notename=expand('%:t')
 		silent exec "au BufWinLeave *" . notename . " let g:opennote = \"\""
-		silent exec "bd " . switchback
+		silent exec "q!"
 		silent exec "sbuffer " . switchback
 	end
 endfunction "}}}
 
 function! s:PNoteAddToDo(...) "{{{
-	let switchback=winbufnr(winnr())
+	let switchback=@%
 	let notetext = a:000[0]
 	python3 << endpy
 import vim
@@ -93,7 +93,7 @@ endpy
 endfunction "}}}
 
 function! s:PNoteAddNote(...) "{{{
-	let switchback=winbufnr(winnr())
+	let switchback=@%
 	let notetext = a:000[0]
 	python3 << endpy
 import vim
@@ -130,7 +130,7 @@ endpy
 endfunction "}}}
 
 function! s:PNoteStrikeThroughNote(...) "{{{
-	let switchback=winbufnr(winnr())
+	let switchback=@%
 	let notetostrike = a:000[0]
 	python3 << endpy
 tostrike = f"{vim.eval('notetostrike')}" + "."
