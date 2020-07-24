@@ -27,6 +27,7 @@ function! s:PNoteGetProjNote() "{{{
 		if filereadable(checkname)
 			let g:opennote=checkname
 			silent exec "vsplit " . checkname
+			silent set noma
 			silent exec "wincmd L"
 			silent exec "vert res 40"
 			silent exec "sbuffer " . switchback
