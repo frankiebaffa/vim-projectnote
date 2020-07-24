@@ -16,34 +16,44 @@ function! s:PNoteGenerateNewProjNote() "{{{
 	end
 endfunction "}}}
 
-function! s:PNoteGetProjNote() "{{{
+function! s:PNoteGenerateIfNotExist() "{{{
+	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+	let checkname=$HOME . "/notes/" . projname . ".pnote"
+	if !filereadable(checkname)
+		call s:PNoteGenerateNewProjNote()
+	end
+endfunction "}}}
+
+function! s:PNoteGenerateAndGetNote() "{{{
 	if g:opennote == ""
-		let switchback=@%
-		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
-		let checkname=$HOME . "/notes/" . projname . ".pnote"
-		if !filereadable(checkname)
-			call s:PNoteGenerateNewProjNote()
-		end
-		if filereadable(checkname)
-			let g:opennote=checkname
-			silent exec "vsplit " . checkname
-			silent setlocal nolist
-			silent setlocal breakat=" ^I!@*-+;:,./?"
-			let &showbreak='+++ '
-			setlocal wrap linebreak
-			setlocal textwidth=0
-			setlocal wrapmargin=0
-			silent setlocal noma
-			silent wincmd L
-			silent vert res 40
-			silent exec "sbuffer " . switchback
-		end
+		call s:PNoteGenerateIfNotExist()
+		call s:PNoteGetNoteIfExist()
+	end
+endfunction "}}}
+
+function! s:PNoteGetNoteIfExist() "{{{
+	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+	let checkname=$HOME . "/notes/" . projname . ".pnote"
+	if filereadable(checkname)
+		let g:opennote=checkname
+		silent exec "vsplit " . checkname
+		silent setlocal syn=projectnote
+		silent setlocal nolist
+		silent setlocal breakat=" ^I!@*-+;:,./?"
+		let &showbreak='+++ '
+		setlocal wrap linebreak
+		setlocal textwidth=0
+		setlocal wrapmargin=0
+		silent setlocal noma
+		silent wincmd L
+		silent vert res 40
+		silent wincmd p
 	end
 endfunction "}}}
 
 function! s:PNoteToggleNote() "{{{
 	if g:opennote == ""
-		call s:PNoteGetProjNote()
+		call s:PNoteGetNoteIfExist()
 	elseif g:opennote != ""
 		call s:PNoteCloseNote()
 	end
@@ -51,17 +61,15 @@ endfunction "}}}
 
 function! s:PNoteCloseNote() "{{{
 	if g:opennote != ""
-		let switchback=@%
 		silent exec "sbuffer " . g:opennote
 		let notename=expand('%:t')
 		silent exec "au BufWinLeave *" . notename . " let g:opennote = \"\""
 		silent exec "q!"
-		silent exec "sbuffer " . switchback
+		silent wincmd p
 	end
 endfunction "}}}
 
 function! s:PNoteAddToDo(...) "{{{
-	let switchback=@%
 	let notetext = a:000[0]
 	python3 << endpy
 import vim
@@ -88,11 +96,10 @@ if addat > 0:
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
-	silent exec "sbuffer " . switchback
+	silent wincmd p
 endfunction "}}}
 
 function! s:PNoteAddNote(...) "{{{
-	let switchback=@%
 	let notetext = a:000[0]
 	python3 << endpy
 import vim
@@ -125,11 +132,10 @@ if start > 0:
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
-	silent exec "sbuffer " . switchback
+	silent wincmd p
 endfunction "}}}
 
 function! s:PNoteStrikeThroughNote(...) "{{{
-	let switchback=@%
 	let notetostrike = a:000[0]
 	python3 << endpy
 tostrike = f"{vim.eval('notetostrike')}" + "."
@@ -153,11 +159,11 @@ with open(vim.eval("g:opennote"), "w") as f:
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
-	silent exec "sbuffer " . switchback
+	silent wincmd p
 endfunction "}}}
 
 " Command Assignments {{{
-command! PNoteOpen :call s:PNoteGetProjNote()
+command! PNoteOpen :call s:PNoteGenerateAndGetNote()
 command! -nargs=1 PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
 command! -nargs=1 PNoteAddNote :call s:PNoteAddNote(<f-args>)
 command! -nargs=1 PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
