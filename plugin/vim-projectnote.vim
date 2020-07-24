@@ -37,7 +37,7 @@ endfunction "}}}
 function! s:PNoteToggleNote() "{{{
 	if g:opennote == ""
 		call s:PNoteGetProjNote()
-	else if g:opennote != ""
+	elseif g:opennote != ""
 		call s:PNoteCloseNote()
 	end
 endfunction "}}}
