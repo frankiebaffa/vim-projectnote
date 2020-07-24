@@ -1,5 +1,3 @@
-" vim:fdm=marker
-
 " =======================
 " Plugin: vim-projectnote
 " Author: Frankie Baffa
@@ -9,16 +7,16 @@
 let g:opennote=""
 set switchbuf+=useopen
 
-function! s:PNoteGenerateNewProjNote()"{{{
+function! s:PNoteGenerateNewProjNote() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
 	if !filereadable(checkname)
 		exec "silent !echo \"\\# " . projname . "\\n\\n[[todo]]\\n\\n[[notes]]\\n\" >> " . checkname
 		exec ':redraw!'
 	end
-endfunction"}}}
+endfunction "}}}
 
-function! s:PNoteGetProjNote()"{{{
+function! s:PNoteGetProjNote() "{{{
 	if g:opennote == ""
 		let switchback=@%
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
@@ -34,9 +32,20 @@ function! s:PNoteGetProjNote()"{{{
 			silent exec "sbuffer " . switchback
 		end
 	end
-endfunction"}}}
+endfunction "}}}
 
-function! s:PNoteAddToDo(...)"{{{
+function! s:PNoteCloseNote() "{{{
+	if g:opennote != ""
+		let switchback=@%
+		silent exec "sbuffer " . g:opennote
+		let notename=expand('%:t')
+		silent exec "au BufWinLeave *" . notename . " let g:opennote = \"\""
+		silent exec "q!"
+		silent exec "sbuffer " . switchback
+	end
+endfunction "}}}
+
+function! s:PNoteAddToDo(...) "{{{
 	let switchback = @%
 	let notetext = a:000[0]
 	python3 << endpy
@@ -65,9 +74,9 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent exec "sbuffer " . switchback
-endfunction"}}}
+endfunction "}}}
 
-function! s:PNoteAddNote(...)"{{{
+function! s:PNoteAddNote(...) "{{{
 	let switchback = @%
 	let notetext = a:000[0]
 	python3 << endpy
@@ -102,9 +111,9 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent exec "sbuffer " . switchback
-endfunction"}}}
+endfunction "}}}
 
-function! s:PNoteStrikeThroughNote(...)"{{{
+function! s:PNoteStrikeThroughNote(...) "{{{
 	let switchback = @%
 	let notetostrike = a:000[0]
 	python3 << endpy
@@ -130,10 +139,15 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent exec "sbuffer " . switchback
-endfunction"}}}
+endfunction "}}}
 
+" Command Assignments {{{
 command! PNoteOpen :call s:PNoteGetProjNote()
 command! -nargs=1 PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
 command! -nargs=1 PNoteAddNote :call s:PNoteAddNote(<f-args>)
 command! -nargs=1 PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
+command! PNoteClose :call s:PNoteCloseNote()
+" }}}
+
+" vim:fdm=marker
 
