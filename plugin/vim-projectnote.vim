@@ -47,8 +47,8 @@ function! s:PNoteGetNoteIfExist() "{{{
 		setlocal wrap linebreak
 		setlocal textwidth=0
 		setlocal wrapmargin=0
-		setlocal buftype=nofile
 		silent setlocal noma
+		setlocal buftype=nofile
 		silent wincmd L
 		silent vert res 40
 		silent wincmd p
