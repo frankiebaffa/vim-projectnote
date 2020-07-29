@@ -1,35 +1,34 @@
 " =======================
-" Plugin: vim-projectnote
+" Plugin: projectnote.vim
 " Author: Frankie Baffa
 " Last Edit: 20200724
 " =======================
 
-" Functions {{{
-function! s:PNoteGenerateNewProjNote() "{{{
+function! projectnote#PNoteGenerateNewProjNote() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
 	if !filereadable(checkname)
-		exec "silent !echo \"\\# " . projname . "\\n\\n[[todo]]\\n\\n[[notes]]\\n\" >> " . checkname
+		exec "silent !echo \"\\# " . projname . "\\n\" >> " . checkname
 		exec ':redraw!'
 	end
 endfunction "}}}
 
-function! s:PNoteGenerateIfNotExist() "{{{
+function! projectnote#PNoteGenerateIfNotExist() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
 	if !filereadable(checkname)
-		call s:PNoteGenerateNewProjNote()
+		call projectnote#PNoteGenerateNewProjNote()
 	end
 endfunction "}}}
 
-function! s:PNoteGenerateAndGetNote() "{{{
+function! projectnote#PNoteGenerateAndGetNote() "{{{
 	if g:opennote == ""
-		call s:PNoteGenerateIfNotExist()
-		call s:PNoteGetNoteIfExist()
+		call projectnote#PNoteGenerateIfNotExist()
+		call projectnote#PNoteGetNoteIfExist()
 	end
 endfunction "}}}
 
-function! s:PNoteGetNoteIfExist() "{{{
+function! projectnote#PNoteGetNoteIfExist() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
 	if filereadable(checkname)
@@ -50,15 +49,15 @@ function! s:PNoteGetNoteIfExist() "{{{
 	end
 endfunction "}}}
 
-function! s:PNoteToggleNote() "{{{
+function! projectnote#PNoteToggleNote() "{{{
 	if g:opennote == ""
-		call s:PNoteGetNoteIfExist()
+		call projectnote#PNoteGetNoteIfExist()
 	elseif g:opennote != ""
-		call s:PNoteCloseNote()
+		call projectnote#PNoteCloseNote()
 	end
 endfunction "}}}
 
-function! s:PNoteCloseNote() "{{{
+function! projectnote#PNoteCloseNote() "{{{
 	if g:opennote != ""
 		silent exec "sbuffer " . g:opennote
 		let notename=expand('%:t')
@@ -68,50 +67,23 @@ function! s:PNoteCloseNote() "{{{
 	end
 endfunction "}}}
 
-function! s:PNoteAddToDo(...) "{{{
+function! projectnote#PNoteAddNote(...) "{{{
 	let notetext = a:000[0]
 	python3 << endpy
 import vim
 lines = []
+nt = vim.eval("notetext")
+cat = nt[0:nt.index(" ")]
+nt = nt.replace(cat+" ", "")
 with open(vim.eval("g:opennote"), "r") as f:
-		lines = f.readlines()
-		f.close()
-
-addat = -1
-iadd = 2
-for i in range(iadd, len(lines)):
-		if lines[i] == "\n":
-				addat = i
-				break
-
-if addat > 0:
-	textto = vim.eval("notetext")
-	lines.insert(addat, f"{addat-iadd}. {textto}\n")
-	content = "".join(lines)
-
-	with open(vim.eval("g:opennote"), "w") as f:
-			f.write(content)
-			f.close()
-endpy
-	silent exec "sbuffer " . g:opennote
-	silent exec "e"
-	silent wincmd p
-endfunction "}}}
-
-function! s:PNoteAddNote(...) "{{{
-	let notetext = a:000[0]
-	python3 << endpy
-import vim
-lines = []
-with open(vim.eval("g:opennote"), "r") as f:
-    lines = f.readlines()
-    f.close()
+	lines = f.readlines()
+	f.close()
 
 start = -1
 for i in range(len(lines)):
-    if lines[i] == "[[notes]]\n":
-        start = i
-        break
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
+		break
 
 if start > 0:
 	addat = -1
@@ -121,8 +93,7 @@ if start > 0:
 					break
 
 	if addat > -1:
-		textto = vim.eval("notetext")
-		lines.insert(addat, f"{addat-start}. {textto}\n")
+		lines.insert(addat, f"{addat-start}. {nt}\n")
 		content = "".join(lines)
 
 		with open(vim.eval("g:opennote"), "w") as f:
@@ -134,7 +105,42 @@ endpy
 	silent wincmd p
 endfunction "}}}
 
-function! s:PNoteStrikeThroughNote(...) "{{{
+function! projectnote#PNoteAddCat(...) "{{{
+	let newcat = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+newcat = vim.eval("newcat")
+if " " not in newcat and len(newcat) > 0:
+	with open(vim.eval("g:opennote"), "r") as f:
+		lines = f.readlines()
+		f.close()
+
+	alreadyexists = False
+	for line in lines:
+		if "[["+newcat+"]]" in line:
+			alreadyexists = True
+			break
+
+	if not alreadyexists:
+		with open(vim.eval("g:opennote"), "a") as f:
+				f.write("[["+newcat+"]]\n\n")
+				f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteSortCat() "{{{
+	python3 << endpy
+import vim
+lines = []
+
+endpy
+endfunction "}}}
+
+function! projectnote#PNoteStrikeThroughNote(...) "{{{
 	let notetostrike = a:000[0]
 	python3 << endpy
 tostrike = f"{vim.eval('notetostrike')}" + ". "
@@ -165,7 +171,7 @@ endpy
 	silent wincmd p
 endfunction "}}}
 
-function! s:PNoteStrikeThroughTodo(...) "{{{
+function! projectnote#PNoteStrikeThroughTodo(...) "{{{
 	let notetostrike = a:000[0]
 	python3 << endpy
 tostrike = f"{vim.eval('notetostrike')}" + ". "
@@ -195,7 +201,6 @@ endpy
 	silent exec "e"
 	silent wincmd p
 endfunction "}}}
-" }}}
 
 " Vim Folder {{{
 " vim:fdm=marker

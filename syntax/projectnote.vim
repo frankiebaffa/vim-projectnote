@@ -16,8 +16,9 @@ syn case ignore
 
 syn match ProjNoteTitle "^#\s.\+$" keepend
 
-syn match ProjNoteCat "^\[\[todo\]\]$"
-syn match ProjNoteCat "^\[\[notes\]\]$"
+syn match ProjNoteCat "\(^\)\@<=\[\[.\+\]\]\($\)\@="
+
+syn region ProjNoteBlock start="\(^\[\[.\+\]\]\)\@<=$" end="^$\n" keepend fold
 
 syn match ProjNoteCatElem "^[0-9]\+\.\s.\+$" keepend
 
