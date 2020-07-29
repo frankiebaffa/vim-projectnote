@@ -40,7 +40,8 @@ PNoteAddNote this is a new note
 `PNoteStrikethrough` marks a todo or note as complete. This command takes an
 argument which signifies the todo or note number:
 ```vim
-PNOteStrikethrough t2
+PNoteStrikeNote 2
+PNoteStrikeTodo 5
 ```
 
 ## Installation
