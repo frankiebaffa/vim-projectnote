@@ -91,7 +91,7 @@ for i in range(iadd, len(lines)):
 
 if addat > 0:
 	textto = vim.eval("notetext")
-	lines.insert(addat, f"t{addat-iadd}. {textto}\n")
+	lines.insert(addat, f"{addat-iadd}. {textto}\n")
 	content = "".join(lines)
 
 	with open(vim.eval("g:opennote"), "w") as f:
@@ -127,7 +127,7 @@ if start > 0:
 
 	if addat > -1:
 		textto = vim.eval("notetext")
-		lines.insert(addat, f"n{addat-start}. {textto}\n")
+		lines.insert(addat, f"{addat-start}. {textto}\n")
 		content = "".join(lines)
 
 		with open(vim.eval("g:opennote"), "w") as f:
@@ -142,24 +142,59 @@ endfunction "}}}
 function! s:PNoteStrikeThroughNote(...) "{{{
 	let notetostrike = a:000[0]
 	python3 << endpy
-tostrike = f"{vim.eval('notetostrike')}" + "."
+tostrike = f"{vim.eval('notetostrike')}" + ". "
 lines = []
-with open(vim.eval("g:opennote"), "r") as f:
-    lines = f.readlines()
-    f.close()
+with open(vim.eval('g:opennote'), "r") as f:
+	lines = f.readlines()
+	f.close()
 
 tolen = len(tostrike)
+insection = False
 for i in range(len(lines)):
-    if lines[i][0:tolen] == tostrike:
-        s = lines[i]
-        lines[i] = "--" + s[0:len(s)-1] + "--" + s[len(s)-1:]
-        break
+	if not insection and lines[i] == "[[notes]]\n":
+		insection = True
+
+	if lines[i][0:tolen] == tostrike and insection:
+		s = lines[i]
+		lines[i] = s[0:len(tostrike)] + "--" + s[len(tostrike):len(s)-1] + "--" + s[len(s)-1:]
+		break
 
 content = "".join(lines)
 
-with open(vim.eval("g:opennote"), "w") as f:
-    f.write(content)
-    f.close()
+with open(vim.eval('g:opennote'), "w") as f:
+	f.write(content)
+	f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! s:PNoteStrikeThroughTodo(...) "{{{
+	let notetostrike = a:000[0]
+	python3 << endpy
+tostrike = f"{vim.eval('notetostrike')}" + ". "
+lines = []
+with open(vim.eval('g:opennote'), "r") as f:
+	lines = f.readlines()
+	f.close()
+
+tolen = len(tostrike)
+insection = False
+for i in range(len(lines)):
+	if not insection and lines[i] == "[[todo]]\n":
+		insection = True
+
+	if lines[i][0:tolen] == tostrike and insection:
+		s = lines[i]
+		lines[i] = s[0:len(tostrike)] + "--" + s[len(tostrike):len(s)-1] + "--" + s[len(s)-1:]
+		break
+
+content = "".join(lines)
+
+with open(vim.eval('g:opennote'), "w") as f:
+	f.write(content)
+	f.close()
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
@@ -170,7 +205,8 @@ endfunction "}}}
 command! PNoteOpen :call s:PNoteGenerateAndGetNote()
 command! -nargs=1 PNoteAddTodo :call s:PNoteAddToDo(<f-args>)
 command! -nargs=1 PNoteAddNote :call s:PNoteAddNote(<f-args>)
-command! -nargs=1 PNoteStrikethrough :call s:PNoteStrikeThroughNote(<f-args>)
+command! -nargs=1 PNoteStrikeNote :call s:PNoteStrikeThroughNote(<f-args>)
+command! -nargs=1 PNoteStrikeTodo :call s:PNoteStrikeThroughTodo(<f-args>)
 command! PNoteClose :call s:PNoteCloseNote()
 command! PNoteToggle :call s:PNoteToggleNote()
 " }}}
