@@ -2,7 +2,7 @@
 
 # in
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-files=("ftdetect/vim-projectnote.vim" "syntax/projectnote.vim" "plugin/vim-projectnote.vim")
+files=("ftdetect/vim-projectnote.vim" "syntax/projectnote.vim" "plugin/vim-projectnote.vim" "autoload/vim-projectnote.vim")
 for file in "${files[@]}"
 do
 	echo -ne "receiving ${file}...";
