@@ -16,13 +16,20 @@ syn case ignore
 
 syn match ProjNoteTitle "^#\s.\+$" keepend
 
-syn match ProjNoteCat "\(^\)\@<=\[\[.\+\]\]\($\)\@="
+syn region ProjNoteBlock start="^\(\[\[\)\@=" end="^$\n"ms=s,me=s keepend fold transparent
+		\ contains=ProjNoteCat,ProjNoteCatElem,ProjNoteCatStruct
 
-syn region ProjNoteBlock start="\(^\[\[.\+\]\]\)\@<=$" end="^$\n" keepend fold
+syn region ProjNoteCat start="^\[\[" end="\]\]$"ms=s+1 oneline
+		\ contained
+		\ containedin=ProjNoteBlock
 
-syn match ProjNoteCatElem "^[0-9]\+\.\s.\+$" keepend
+syn region ProjNoteCatElem start="^[0-9]\+\." end="$" keepend oneline
+		\ contained
+		\ containedin=ProjNoteBlock
 
-syn match ProjNoteCatStruck "^[0-9]\+\.\s--.\+--$" keepend
+syn region ProjNoteCatStruck start="^[0-9]\+\.\s--" end="--$" keepend oneline
+		\ contained
+		\ containedin=ProjNoteBlock
 
 hi def link ProjNoteTitle statement
 hi def link ProjNoteCat type
