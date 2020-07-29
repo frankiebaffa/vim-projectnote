@@ -41,6 +41,7 @@ function! projectnote#PNoteGetNoteIfExist() "{{{
 		setlocal wrap linebreak
 		setlocal textwidth=0
 		setlocal wrapmargin=0
+		setlocal fdm=syntax
 		silent setlocal noma
 		setlocal buftype=nofile
 		silent wincmd L
@@ -136,7 +137,39 @@ function! projectnote#PNoteSortCat() "{{{
 	python3 << endpy
 import vim
 lines = []
+with open(vim.eval("g:opennote"), "r") as f:
+	lines = f.readlines()
+	f.close()
 
+notes={
+	"title":"",
+	"categories":[],
+	"catnotes":{}
+}
+
+activecat = None
+for line in lines:
+	if line == "\n":
+		pass
+	elif line[0:1] == "#":
+		notes["title"] = line
+	elif line[0:1] == "[[":
+		activecat = line
+		notes["categories"].append(line)
+		notes["catnotes"][line] = []
+		print(notes)
+	elif line[0:1].isdigit():
+		print(activecat)
+		notes["catnotes"][activecat].append(line)
+
+content = f"{notes['title']}\n\n"
+notes["categories"].sort()
+for cat in notes["categories"]:
+	content += f"{cat}\n"
+	for note in notes["catnotes"][cat]:
+		content += f"{note}\n"
+content += "\n"
+print(content)
 endpy
 endfunction "}}}
 

@@ -17,6 +17,7 @@ command! -nargs=1 PNoteStrikeNote :call projectnote#PNoteStrikeThroughNote(<f-ar
 command! -nargs=1 PNoteStrikeTodo :call projectnote#PNoteStrikeThroughTodo(<f-args>)
 command! PNoteClose :call projectnote#PNoteCloseNote()
 command! PNoteToggle :call projectnote#PNoteToggleNote()
+command! PNoteSortCat :call projectnote#PNoteSortCat()
 " }}}
 
 " Vim Folder {{{
