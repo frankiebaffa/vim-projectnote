@@ -21,7 +21,7 @@ syn match ProjNoteCat "^\[\[notes\]\]$"
 
 syn match ProjNoteCatElem "^[0-9]\+\.\s.\+$" keepend
 
-syn match ProjNoteCatStruct "^[0-9]\+\.\s--.\+--$" keepend
+syn match ProjNoteCatStruck "^[0-9]\+\.\s--.\+--$" keepend
 
 hi def link ProjNoteTitle statement
 hi def link ProjNoteCat type
