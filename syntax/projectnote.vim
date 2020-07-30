@@ -16,10 +16,10 @@ syn case ignore
 
 syn match ProjNoteTitle "^#\s.\+$" keepend
 
-syn region ProjNoteBlock start="^\(\[\[\)\@=" end="^$\n"ms=s,me=s keepend fold transparent
-		\ contains=ProjNoteCat,ProjNoteCatElem,ProjNoteCatStruct
+syn region ProjNoteBlock start="^\(\[\[\)\@=" end="^$\n" keepend fold
+		\ transparent contains=ProjNoteCat,ProjNoteCatElem,ProjNoteCatStruct
 
-syn region ProjNoteCat start="^\[\[" end="\]\]$"ms=s+1 oneline
+syn region ProjNoteCat start="^\[\[" end="\]\]$" oneline
 		\ contained
 		\ containedin=ProjNoteBlock
 
