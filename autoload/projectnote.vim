@@ -50,6 +50,54 @@ function! projectnote#PNoteGetNoteIfExist() "{{{
 	end
 endfunction "}}}
 
+function! projectnote#PNoteExpandAll() "{{{
+	if g:opennote != ""
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		silent exec "normal zR"
+		silent exec "wincmd p"
+	end
+endfunction "}}}
+
+function! projectnote#PNoteCollapseAll() "{{{
+	if g:opennote != ""
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		silent exec "normal zM"
+		silent exec "wincmd p"
+	end
+endfunction "}}}
+
+function! projectnote#PNoteExpandCat(...) "{{{
+	if g:opennote != ""
+		let category = a:000[0]
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		silent exec "normal gg"
+		silent let @/="[[" . category . "]]"
+		silent exec "normal nzo"
+		silent exec "noh"
+		silent exec "wincmd p"
+	end
+endfunction "}}}
+
+function! projectnote#PNoteCollapseCat(...) "{{{
+	if g:opennote != ""
+		let category = a:000[0]
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		silent exec "normal gg"
+		silent let @/="[[" . category . "]]"
+		silent exec "normal nzc"
+		silent exec "noh"
+		silent exec "wincmd p"
+	end
+endfunction "}}}
+
 function! projectnote#PNoteToggleNote() "{{{
 	if g:opennote == ""
 		call projectnote#PNoteGetNoteIfExist()
@@ -133,7 +181,169 @@ endpy
 	silent wincmd p
 endfunction "}}}
 
-function! projectnote#PNoteSortCat() "{{{
+function! projectnote#PNoteEdit(...) "{{{
+	let noteedit = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+nt = vim.eval("noteedit")
+cat = nt[0:nt.index(" ")]
+nt = nt.replace(cat+" ", "")
+num = nt[0:nt.index(" ")]
+nt = nt.replace(num+" ", "")
+num = f"{num}."
+
+with open(vim.eval("g:opennote"), "r") as f:
+	lines = f.readlines()
+	f.close()
+
+start = -1
+for i in range(len(lines)):
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
+		break
+
+if start > 0:
+	ischanged = False
+	for i in range(start, len(lines)):
+		if lines[i][0:len(num)] == num:
+			lines[i] = f"{num} {nt}\n"
+			ischanged = True
+			break
+		elif lines[i][0:2] == "[[" and lines[i] != "[["+cat+"]]\n":
+			break
+
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+				f.write("".join(lines))
+				f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteDelete(...) "{{{
+	let catnum = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+cn = vim.eval("catnum")
+cat = cn[0:cn.index(" ")]
+cn = cn.replace(cat+" ", "")
+num = cn[0:len(cn)]
+num = f"{num}."
+
+if num != None and len(num) > 0 and num[0:num.index(".")].isdigit():
+	with open(vim.eval("g:opennote"), "r") as f:
+		lines = f.readlines()
+		f.close()
+	
+	start = -1
+	for i in range(len(lines)):
+		if lines[i] == "[["+cat+"]]\n":
+			start = i
+			break
+
+	if start > 0:
+		ischanged = True
+		lines_cp = lines.copy()
+		for i in range(start, len(lines_cp)):
+			line = lines_cp[i]
+			if line[0:len(num)] == num:
+				lines.pop(i)
+				ischanged = True
+			elif line[0:2] == "[[" and line != "[["+cat+"]]\n":
+				break
+			elif ischanged and line[0:1].isdigit():
+				numstop = line.index(".")
+				integer = int(line[0:numstop])
+				integer -= 1
+				lines[i-1] = lines[i-1].replace(line[0:numstop], f"{integer}")
+
+		if ischanged:
+			with open(vim.eval("g:opennote"), "w") as f:
+					f.write("".join(lines))
+					f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteDeleteCat(...) "{{{
+	let cat = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+cat = vim.eval("cat")
+
+with open(vim.eval("g:opennote"), "r") as f:
+	lines = f.readlines()
+	f.close()
+
+start = -1
+for i in range(len(lines)):
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
+		break
+
+ischanged = False
+dcount = 0
+if start > 0:
+	lines_cp = lines.copy()
+	for i in range(start, len(lines_cp)):
+		line = lines_cp[i]
+		ischanged = True
+		if line[0:1].isdigit() or line == "[["+cat+"]]\n" or line == "\n":
+			lines.pop(i-dcount)
+			dcount += 1
+			if line == "\n":
+				break
+
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+			f.write("".join(lines))
+			f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteEditCat(...) "{{{
+	let catedit = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+catedit = vim.eval("catedit")
+oldcat = nt[0:nt.index(" ")]
+catedit = catedit.replace(oldcat+" ", "")
+newcat = catedit[0:len(catedit)]
+
+if newcat != None and len(newcat) > 0:
+	with open(vim.eval("g:opennote"), "r") as f:
+		lines = f.readlines()
+		f.close()
+
+	ischanged = False
+	for i in range(len(lines)):
+		if lines[i] == "[["+oldcat+"]]\n":
+			lines[i] = "[["+newcat+"]]\n"
+			ischanged = True
+			break
+
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+				f.write("".join(lines))
+				f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteSort() "{{{
 	python3 << endpy
 import vim
 lines = []
@@ -153,82 +363,113 @@ for line in lines:
 		pass
 	elif line[0:1] == "#":
 		notes["title"] = line
-	elif line[0:1] == "[[":
+	elif line[0:2] == "[[":
 		activecat = line
 		notes["categories"].append(line)
 		notes["catnotes"][line] = []
-		print(notes)
 	elif line[0:1].isdigit():
-		print(activecat)
 		notes["catnotes"][activecat].append(line)
 
-content = f"{notes['title']}\n\n"
+content = f"{notes['title']}\n"
 notes["categories"].sort()
 for cat in notes["categories"]:
-	content += f"{cat}\n"
+	content += f"{cat}"
 	for note in notes["catnotes"][cat]:
-		content += f"{note}\n"
-content += "\n"
-print(content)
-endpy
-endfunction "}}}
+		content += f"{note}"
+	content += "\n"
+content += ""
 
-function! projectnote#PNoteStrikeThroughNote(...) "{{{
-	let notetostrike = a:000[0]
-	python3 << endpy
-tostrike = f"{vim.eval('notetostrike')}" + ". "
-lines = []
-with open(vim.eval('g:opennote'), "r") as f:
-	lines = f.readlines()
-	f.close()
-
-tolen = len(tostrike)
-insection = False
-for i in range(len(lines)):
-	if not insection and lines[i] == "[[notes]]\n":
-		insection = True
-
-	if lines[i][0:tolen] == tostrike and insection:
-		s = lines[i]
-		lines[i] = s[0:len(tostrike)] + "--" + s[len(tostrike):len(s)-1] + "--" + s[len(s)-1:]
-		break
-
-content = "".join(lines)
-
-with open(vim.eval('g:opennote'), "w") as f:
-	f.write(content)
-	f.close()
+with open(vim.eval("g:opennote"), "w") as f:
+		f.write(content)
+		f.close()
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
 endfunction "}}}
 
-function! projectnote#PNoteStrikeThroughTodo(...) "{{{
-	let notetostrike = a:000[0]
+function! projectnote#PNoteStrike(...) "{{{
+	let noteedit = a:000[0]
 	python3 << endpy
-tostrike = f"{vim.eval('notetostrike')}" + ". "
+import vim
 lines = []
-with open(vim.eval('g:opennote'), "r") as f:
+nt = vim.eval("noteedit")
+cat = nt[0:nt.index(" ")]
+nt = nt.replace(cat+" ", "")
+num = nt[0:len(nt)]
+num = f"{num}."
+
+with open(vim.eval("g:opennote"), "r") as f:
 	lines = f.readlines()
 	f.close()
 
-tolen = len(tostrike)
-insection = False
+start = -1
 for i in range(len(lines)):
-	if not insection and lines[i] == "[[todo]]\n":
-		insection = True
-
-	if lines[i][0:tolen] == tostrike and insection:
-		s = lines[i]
-		lines[i] = s[0:len(tostrike)] + "--" + s[len(tostrike):len(s)-1] + "--" + s[len(s)-1:]
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
 		break
 
-content = "".join(lines)
+if start > 0:
+	ischanged = False
+	for i in range(start, len(lines)):
+		if lines[i][0:len(num)] == num:
+			lines[i] = lines[i].replace(f"{num} ", f"{num} --").replace("\n", "--\n")
+			ischanged = True
+			break
+		elif lines[i][0:2] == "[[" and lines[i] != "[["+cat+"]]\n":
+			break
 
-with open(vim.eval('g:opennote'), "w") as f:
-	f.write(content)
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+				f.write("".join(lines))
+				f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+endfunction "}}}
+
+function! projectnote#PNoteUndoStrike(...) "{{{
+	let noteedit = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+nt = vim.eval("noteedit")
+cat = None
+num = None
+try:
+	cat = nt[0:nt.index(" ")]
+	nt = nt.replace(cat+" ", "")
+	num = nt[0:len(nt)]
+	num = f"{num}."
+except:
+	print("Arguments <Category> <Number> must be included")
+	return
+
+with open(vim.eval("g:opennote"), "r") as f:
+	lines = f.readlines()
 	f.close()
+
+start = -1
+for i in range(len(lines)):
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
+		break
+
+if start > 0:
+	ischanged = False
+	for i in range(start, len(lines)):
+		if lines[i][0:len(num)] == num:
+			lines[i] = lines[i].replace(f"{num} --", f"{num} ").replace("--\n", "\n")
+			ischanged = True
+			break
+		elif lines[i][0:2] == "[[" and lines[i] != "[["+cat+"]]\n":
+			break
+
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+				f.write("".join(lines))
+				f.close()
 endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
