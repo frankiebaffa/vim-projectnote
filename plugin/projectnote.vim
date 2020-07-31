@@ -29,7 +29,8 @@ command! -nargs=1 PNoteCollapseCat :call projectnote#PNoteCollapseCat(<f-args>)
 " }}}
 
 " Autocmd {{{
-au VimResized * call projectnote#PNoteForceSize()
+au BufWinLeave * call projectnote#PNoteForceSize()
+au BufWinEnter * call projectnote#PNoteForceSize()
 " }}}
 
 " Vim Folder {{{
