@@ -23,7 +23,7 @@ endfunction "}}}
 
 function! projectnote#PNoteForceSize() "{{{
 	if g:opennote != ""
-		silent exec "sbuffer " . g:opennote . " | res 40 | wincmd p"
+		silent exec "sbuffer " . g:opennote . " | vert res 40 | wincmd p"
 	end
 endfunction
 " }}}
