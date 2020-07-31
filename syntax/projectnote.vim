@@ -1,5 +1,5 @@
 " Vim Syntax File
-" Language: Marktwo
+" Language: PNote
 " Maintainer: Frankie Baffa
 " Latest Revision 20 Feb 2020
 
@@ -31,8 +31,8 @@ syn region ProjNoteCatStruck start="^[0-9]\+\.\s--" end="--$" keepend oneline
 		\ contained
 		\ containedin=ProjNoteBlock
 
-hi def link ProjNoteTitle statement
-hi def link ProjNoteCat type
-hi def link ProjNoteCatElem preproc
-hi def link ProjNoteCatStruck comment
+hi def link ProjNoteTitle Statement
+hi def link ProjNoteCat Type
+hi def link ProjNoteCatElem Normal
+hi def link ProjNoteCatStruck Comment
 
