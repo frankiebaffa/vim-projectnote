@@ -28,6 +28,10 @@ command! PNoteCollapseAll :call projectnote#PNoteCollapseAll()
 command! -nargs=1 PNoteCollapseCat :call projectnote#PNoteCollapseCat(<f-args>)
 " }}}
 
+" Autocmd {{{
+au VimResized * call projectnote#PNoteForceSize()
+" }}}
+
 " Vim Folder {{{
 " vim:fdm=marker
 " }}}

@@ -21,6 +21,12 @@ function! projectnote#PNoteGenerateIfNotExist() "{{{
 	end
 endfunction "}}}
 
+function! projectnote#PNoteForceSize() "{{{
+	if g:opennote != ""
+		silent exec "sbuffer " . g:opennote . " | res 40 | wincmd p"
+	end
+" }}}
+
 function! projectnote#PNoteGenerateAndGetNote() "{{{
 	if g:opennote == ""
 		call projectnote#PNoteGenerateIfNotExist()
