@@ -3,6 +3,7 @@
 " Maintainer: Frankie Baffa
 " Latest Revision 20 Feb 2020
 
+" Syntax Settings {{{
 if exists("b:current_syntax")
 	finish
 endif
@@ -13,7 +14,8 @@ set cpo&vim
 syntax spell toplevel
 
 syn case ignore
-
+" }}}
+" Syntax Groups {{{
 syn match ProjNoteTitle "^#\s.\+$" keepend
 
 syn region ProjNoteBlock start="^\(\[\[\)\@=" end="^$\n" keepend fold
@@ -30,9 +32,14 @@ syn region ProjNoteCatElem start="^[0-9]\+\." end="$" keepend oneline
 syn region ProjNoteCatStruck start="^[0-9]\+\.\s--" end="--$" keepend oneline
 		\ contained
 		\ containedin=ProjNoteBlock
-
+" }}}
+" Highlight Group Links {{{
 hi def link ProjNoteTitle Statement
 hi def link ProjNoteCat Type
 hi def link ProjNoteCatElem Normal
 hi def link ProjNoteCatStruck Comment
+" }}}
+" Vim Folder {{{
+" vim:fdm=marker
+" }}}
 
