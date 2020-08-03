@@ -8,7 +8,6 @@
 let g:opennote=""
 set switchbuf+=useopen
 " }}}
-
 " Command Assignments {{{
 command! PNoteOpen :call projectnote#PNoteGenerateAndGetNote()
 command! -nargs=1 PNoteAddNote :call projectnote#PNoteAddNote(<f-args>)
@@ -27,11 +26,10 @@ command! -nargs=1 PNoteExpandCat :call projectnote#PNoteExpandCat(<f-args>)
 command! PNoteCollapseAll :call projectnote#PNoteCollapseAll()
 command! -nargs=1 PNoteCollapseCat :call projectnote#PNoteCollapseCat(<f-args>)
 " }}}
-
 " Autocmd {{{
-au BufWinLeave,BufWinEnter,BufLeave,BufEnter,WinLeave,WinEnter * call projectnote#PNoteForceSize()
+" force size of window on file open / close
+"au BufWinLeave,BufWinEnter,BufLeave,BufEnter,WinLeave,WinEnter * call projectnote#PNoteForceSize()
 " }}}
-
 " Vim Folder {{{
 " vim:fdm=marker
 " }}}
