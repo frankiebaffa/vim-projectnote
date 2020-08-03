@@ -84,7 +84,7 @@ function! projectnote#PNoteExpandCat(...) "{{{
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
 		silent exec "sbuffer " . checkname
 		silent exec "normal gg"
-		silent let @/="[[" . category . "]]"
+		silent let @/="\\[\\[" . category . "\\]\\]"
 		silent exec "normal nzo"
 		silent exec "noh"
 		silent exec "wincmd p"
@@ -98,7 +98,7 @@ function! projectnote#PNoteCollapseCat(...) "{{{
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
 		silent exec "sbuffer " . checkname
 		silent exec "normal gg"
-		silent let @/="[[" . category . "]]"
+		silent let @/="\\[\\[" . category . "\\]\\]"
 		silent exec "normal nzc"
 		silent exec "noh"
 		silent exec "wincmd p"
