@@ -49,8 +49,7 @@ function! projectnote#PNoteGetNoteIfExist() "{{{
 		setlocal textwidth=0
 		setlocal wrapmargin=0
 		setlocal fdm=syntax
-		silent setlocal noma
-		setlocal buftype=nofile
+		setlocal buftype=nofile noma nonumber
 		silent wincmd L
 		silent vert res 40
 		silent wincmd p
