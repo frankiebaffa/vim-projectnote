@@ -3,6 +3,45 @@
 " Author: Frankie Baffa
 " Last Edit: 20200724
 " =======================
+function! projectnote#PNoteGetFilenameHash() " {{{
+	let filepath=expand("%:p")
+
+	python3 << endpy
+import vim
+import hashlib
+filepath = vim.eval('filepath')
+hashname = hashlib.sha256(bytes(filepath, 'ascii')).hexdigest()
+vim.command(f"let hashname='{hashname}'")
+endpy
+
+return hashname
+endfunction " }}}
+function! projectnote#PNoteMakeView() " {{{
+	if g:opennote != ""
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		setlocal ma buftype=
+		let filename=projectnote#PNoteGetFilenameHash()
+		let fullpath=$HOME . "/.vim/view/" . filename
+		exec "mkview! " . fullpath
+		setlocal buftype=nofile noma
+		silent exec "wincmd p"
+	endif
+endfunction " }}}
+function! projectnote#PNoteLoadView() " {{{
+	if g:opennote != ""
+		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
+		let checkname=$HOME . "/notes/" . projname . ".pnote"
+		silent exec "sbuffer " . checkname
+		let filename=projectnote#PNoteGetFilenameHash()
+		let fullpath=$HOME . "/.vim/view/" . filename
+		if filereadable(fullpath)
+			exec "source " . fullpath
+		endif
+		silent exec "wincmd p"
+	endif
+endfunction " }}}
 
 function! projectnote#PNoteGenerateNewProjNote() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
@@ -12,7 +51,6 @@ function! projectnote#PNoteGenerateNewProjNote() "{{{
 		exec ':redraw!'
 	end
 endfunction "}}}
-
 function! projectnote#PNoteGenerateIfNotExist() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
@@ -20,21 +58,18 @@ function! projectnote#PNoteGenerateIfNotExist() "{{{
 		call projectnote#PNoteGenerateNewProjNote()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteForceSize() "{{{
 	if g:opennote != ""
 		silent exec "sbuffer " . g:opennote . " | vert res 40 | wincmd p"
 	end
 endfunction
 " }}}
-
 function! projectnote#PNoteGenerateAndGetNote() "{{{
 	if g:opennote == ""
 		call projectnote#PNoteGenerateIfNotExist()
 		call projectnote#PNoteGetNoteIfExist()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteGetNoteIfExist() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
@@ -53,9 +88,9 @@ function! projectnote#PNoteGetNoteIfExist() "{{{
 		silent wincmd L
 		silent vert res 40
 		silent wincmd p
+		call projectnote#PNoteLoadView()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteExpandAll() "{{{
 	if g:opennote != ""
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
@@ -63,9 +98,9 @@ function! projectnote#PNoteExpandAll() "{{{
 		silent exec "sbuffer " . checkname
 		silent exec "normal zR"
 		silent exec "wincmd p"
+		call projectnote#PNoteMakeView()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteCollapseAll() "{{{
 	if g:opennote != ""
 		let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
@@ -73,9 +108,9 @@ function! projectnote#PNoteCollapseAll() "{{{
 		silent exec "sbuffer " . checkname
 		silent exec "normal zM"
 		silent exec "wincmd p"
+		call projectnote#PNoteMakeView()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteExpandCat(...) "{{{
 	if g:opennote != ""
 		let category = a:000[0]
@@ -87,9 +122,9 @@ function! projectnote#PNoteExpandCat(...) "{{{
 		silent exec "normal nzo"
 		silent exec "noh"
 		silent exec "wincmd p"
+		call projectnote#PNoteMakeView()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteCollapseCat(...) "{{{
 	if g:opennote != ""
 		let category = a:000[0]
@@ -101,9 +136,9 @@ function! projectnote#PNoteCollapseCat(...) "{{{
 		silent exec "normal nzc"
 		silent exec "noh"
 		silent exec "wincmd p"
+		call projectnote#PNoteMakeView()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteToggleNote() "{{{
 	if g:opennote == ""
 		call projectnote#PNoteGetNoteIfExist()
@@ -111,7 +146,6 @@ function! projectnote#PNoteToggleNote() "{{{
 		call projectnote#PNoteCloseNote()
 	end
 endfunction "}}}
-
 function! projectnote#PNoteCloseNote() "{{{
 	if g:opennote != ""
 		silent exec "sbuffer " . g:opennote
@@ -121,7 +155,6 @@ function! projectnote#PNoteCloseNote() "{{{
 		silent wincmd p
 	end
 endfunction "}}}
-
 function! projectnote#PNoteAddNote(...) "{{{
 	let notetext = a:000[0]
 	python3 << endpy
@@ -158,8 +191,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteAddCat(...) "{{{
 	let newcat = a:000[0]
 	python3 << endpy
@@ -185,8 +218,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteEdit(...) "{{{
 	let noteedit = a:000[0]
 	python3 << endpy
@@ -227,8 +260,62 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
+function! projectnote#PNoteInsert(...) "{{{
+	let noteedit = a:000[0]
+	python3 << endpy
+import vim
+lines = []
+nt = vim.eval("noteedit")
+cat = nt[0:nt.index(" ")]
+nt = nt.replace(cat+" ", "")
+num = nt[0:nt.index(" ")]
+nt = nt.replace(num+" ", "")
+num = f"{num}."
 
+with open(vim.eval("g:opennote"), "r") as f:
+	lines = f.readlines()
+	f.close()
+
+start = -1
+for i in range(len(lines)):
+	if lines[i] == "[["+cat+"]]\n":
+		start = i
+		break
+
+if start > 0:
+	ischanged = False
+	for i in range(start, len(lines)):
+		if lines[i][0:len(num)] == num:
+			lines.insert(i, f"{num} {nt}\n")
+			ischanged = True
+		elif lines[i][0:2] == "[[" and lines[i] != "[["+cat+"]]\n":
+			break
+		elif ischanged:
+			iofnan = 1
+			s = ''
+			while lines[i][0:iofnan].isdigit():
+				s = lines[i][0:iofnan]
+				print(s)
+				iofnan += 1
+			iofnan -= 1
+			orig = s
+			sint = int(s)+1
+			s = str(sint)
+			print(s)
+			lines[i] = lines[i].replace(orig, s, 1)
+
+	if ischanged:
+		with open(vim.eval("g:opennote"), "w") as f:
+				f.write("".join(lines))
+				f.close()
+endpy
+	silent exec "sbuffer " . g:opennote
+	silent exec "e"
+	silent wincmd p
+	call projectnote#PNoteLoadView()
+endfunction "}}}
 function! projectnote#PNoteDelete(...) "{{{
 	let catnum = a:000[0]
 	python3 << endpy
@@ -275,8 +362,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteDeleteCat(...) "{{{
 	let cat = a:000[0]
 	python3 << endpy
@@ -315,8 +402,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteEditCat(...) "{{{
 	let catedit = a:000[0]
 	python3 << endpy
@@ -347,8 +434,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteSort() "{{{
 	python3 << endpy
 import vim
@@ -392,8 +479,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteStrike(...) "{{{
 	let noteedit = a:000[0]
 	python3 << endpy
@@ -433,8 +520,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 function! projectnote#PNoteUndoStrike(...) "{{{
 	let noteedit = a:000[0]
 	python3 << endpy
@@ -480,8 +567,8 @@ endpy
 	silent exec "sbuffer " . g:opennote
 	silent exec "e"
 	silent wincmd p
+	call projectnote#PNoteLoadView()
 endfunction "}}}
-
 " Vim Folder {{{
 " vim:fdm=marker
 " }}}
