@@ -5,7 +5,6 @@
 " =======================
 
 " Settings {{{
-let g:opennote=""
 set switchbuf+=useopen
 " }}}
 " Command Assignments {{{
