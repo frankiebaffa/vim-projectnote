@@ -22,6 +22,7 @@ function! projectnote#PNoteMakeView() " {{{
 		let checkname=$HOME . "/notes/" . projname . ".pnote"
 		silent exec "sbuffer " . checkname
 		setlocal ma buftype=
+		setlocal filetype=projectnote
 		let filename=projectnote#PNoteGetFilenameHash()
 		let fullpath=$HOME . "/.vim/view/" . filename
 		exec "mkview! " . fullpath
@@ -39,6 +40,7 @@ function! projectnote#PNoteLoadView() " {{{
 		if filereadable(fullpath)
 			exec "source " . fullpath
 		endif
+		setlocal buftype=nofile noma
 		silent exec "wincmd p"
 	endif
 endfunction " }}}
