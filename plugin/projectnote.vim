@@ -25,6 +25,7 @@ command! PNoteExpandAll :call projectnote#PNoteExpandAll()
 command! -nargs=1 PNoteExpandCat :call projectnote#PNoteExpandCat(<f-args>)
 command! PNoteCollapseAll :call projectnote#PNoteCollapseAll()
 command! -nargs=1 PNoteCollapseCat :call projectnote#PNoteCollapseCat(<f-args>)
+command! -nargs=1 PNoteInsert :call projectnote#PNoteInsert(<f-args>)
 " }}}
 " Autocmd {{{
 " force size of window on file open / close
