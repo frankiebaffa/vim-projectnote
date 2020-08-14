@@ -72,14 +72,13 @@ endfunction " }}}
 function! projectnote#PNoteGenerateNewProjNote() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
-	if !filereadable(checkname)
-		exec "silent !echo \"\\# " . projname . "\\n\" >> " . checkname
-		exec ':redraw!'
-	end
+	exec "silent !echo \"\\# " . projname . "\\n\" >> " . checkname
+	exec ':redraw!'
 endfunction "}}}
 function! projectnote#PNoteGenerateIfNotExist() "{{{
 	let projname=split(getcwd(), "/")[len(split(getcwd(), "/"))-1]
 	let checkname=$HOME . "/notes/" . projname . ".pnote"
+	let test=!filereadable(checkname)
 	if !filereadable(checkname)
 		call projectnote#PNoteGenerateNewProjNote()
 	end
@@ -91,9 +90,6 @@ function! projectnote#PNoteForceSize() "{{{
 endfunction
 " }}}
 function! projectnote#PNoteGenerateAndGetNote() "{{{
-	if projectnote#NotOpen()
-		return
-	endif
 	call projectnote#PNoteGenerateIfNotExist()
 	call projectnote#PNoteGetNoteIfExist()
 endfunction "}}}
